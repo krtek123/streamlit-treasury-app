@@ -18,8 +18,8 @@ class FixedBond:
         self.yield_curve_df = yield_curves_df
         self.trade_date = pd.to_datetime(trade_date)
         self.currency_code = currency_code
-        self.principal_payment_frequency = emission["Principal Payment Frequency"].iloc[0]
-        self.coupon_frequency = emission["Coupon Frequency"].iloc[0]
+        self.principal_payment_frequency = emission["Principal Payment Frequency"]
+        self.coupon_frequency = emission["Coupon Frequency"]
         self.business_day_convention = bond_data["Business Day Convention"]
         self.day_count_convention = bond_data["Day Count Convention"]  # Added Day Count Convention
         self.number_of_pieces = number_of_pieces
@@ -180,7 +180,7 @@ class FixedBond:
             cumulative_length_of_period += length_of_period
             
             # Use the interpolate_rate function to get the interpolated rate for the current period
-            rate_interpolated = interpolate_rate(cumulative_length_of_period / 360)
+            rate_interpolated = interpolate_rate(cumulative_length_of_period / 360)/100
     
             # Calculate the discounted coupon payment and principal repayment
             time_to_payment = cumulative_length_of_period / 360  # Time in years (since we've converted length_of_period to years)
