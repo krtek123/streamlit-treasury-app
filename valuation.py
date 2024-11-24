@@ -16,7 +16,7 @@ class FixedBond:
         self.yield_curve_df = yield_curves_df
         self.trade_date = pd.to_datetime(trade_date)
         self.currency_code = currency_code
-        self.principal_payment_frequency = bond_data["Principal Payment Frequency"]
+        self.principal_payment_frequency = principal_payment_frequency
         self.coupon_frequency = bond_data["Coupon Frequency"]
         self.business_day_convention = bond_data["Business Day Convention"]
         self.day_count_convention = bond_data["Day Count Convention"]  # Added Day Count Convention
