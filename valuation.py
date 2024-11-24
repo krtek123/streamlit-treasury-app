@@ -18,14 +18,8 @@ class FixedBond:
         self.yield_curve_df = yield_curves_df
         self.trade_date = pd.to_datetime(trade_date)
         self.currency_code = currency_code
-        try:
-            self.principal_payment_frequency = emission["Principal Payment Frequency"].iloc[0]
-        except:
-            self.principal_payment_frequency = emission["Principal Payment Frequency"]
-        try:
-            self.coupon_frequency = emission["Coupon Frequency"].iloc[0]
-        except:
-            self.coupon_frequency = emission["Coupon Frequency"]
+        self.principal_payment_frequency = emission["Principal Payment Frequency"].iloc[0]
+        self.coupon_frequency = emission["Coupon Frequency"].iloc[0]
         self.business_day_convention = bond_data["Business Day Convention"]
         self.day_count_convention = bond_data["Day Count Convention"]  # Added Day Count Convention
         self.number_of_pieces = number_of_pieces
@@ -192,7 +186,7 @@ class FixedBond:
             time_to_payment = cumulative_length_of_period / 360  # Time in years (since we've converted length_of_period to years)
             
             # Discount the coupon payment
-            coupon_discount = coupon_payment / (1 + (rate_interpolated ) + shift) ** time_to_payment
+            coupon_discount = coupon_payment / (1 + (rate_interpolated / 100) + shift) ** time_to_payment
             
             # Calculate principal repayment
             if self.principal_payment_frequency != "At Maturity" and (date != self.maturity_date):
@@ -205,7 +199,7 @@ class FixedBond:
                 remaining_principal = 0  # Principal is fully paid off at maturity
             
             # Discount the principal repayment
-            principal_discount = principal_repayment / (1 + (rate_interpolated ) + shift) ** time_to_payment
+            principal_discount = principal_repayment / (1 + (rate_interpolated / 100) + shift) ** time_to_payment
     
             # Append the cash flow details with new columns for Interpolated Rate and Discounted Payments
             cash_flows.append({
