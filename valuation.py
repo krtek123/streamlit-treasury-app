@@ -183,7 +183,7 @@ class FixedBond:
             rate_interpolated = interpolate_rate(cumulative_length_of_period / 360)
     
             # Calculate the discounted coupon payment and principal repayment
-            time_to_payment = length_in_years  # Time in years (since we've converted length_of_period to years)
+            time_to_payment = cumulative_length_of_period / 360  # Time in years (since we've converted length_of_period to years)
             
             # Discount the coupon payment
             coupon_discount = coupon_payment / (1 + (rate_interpolated + shift) / 100) ** time_to_payment
@@ -193,7 +193,7 @@ class FixedBond:
                 # If it's not the maturity date, we amortize the principal
                 principal_repayment = calculate_principal_payment(date, payment_dates[0], payment_dates[-1])
                 remaining_principal -= principal_repayment
-            elif date == self.maturity_date:
+            if date == self.maturity_date:
                 # At maturity, the entire remaining principal is repaid
                 principal_repayment = remaining_principal
                 remaining_principal = 0  # Principal is fully paid off at maturity
