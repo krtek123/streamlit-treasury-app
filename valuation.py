@@ -8,6 +8,8 @@ class FixedBond:
     def __init__(self, bond_data, yield_curves_df, trade_date, currency_code, principal_payment_frequency="At Maturity", coupon_frequency="Annual", number_of_pieces=1):
         self.issue_name = bond_data["Issue Name"]
         self.isin = bond_data["ISIN"]
+        emission = pd.read_csv("bond_emissions.csv")
+        emission = emission[emission.ISIN == self.isin]
         self.maturity_date = pd.to_datetime(bond_data["Maturity Date"])
         self.nominal_value = bond_data["Nominal Value (1 unit)"]
         self.currency = bond_data["Nominal Value Currency"]
@@ -16,8 +18,8 @@ class FixedBond:
         self.yield_curve_df = yield_curves_df
         self.trade_date = pd.to_datetime(trade_date)
         self.currency_code = currency_code
-        self.principal_payment_frequency = principal_payment_frequency
-        self.coupon_frequency = bond_data["Coupon Frequency"]
+        self.principal_payment_frequency = emission["Principal Payment Frequency"]
+        self.coupon_frequency = emission["Coupon Frequency"]
         self.business_day_convention = bond_data["Business Day Convention"]
         self.day_count_convention = bond_data["Day Count Convention"]  # Added Day Count Convention
         self.number_of_pieces = number_of_pieces
