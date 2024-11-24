@@ -18,8 +18,8 @@ class FixedBond:
         self.yield_curve_df = yield_curves_df
         self.trade_date = pd.to_datetime(trade_date)
         self.currency_code = currency_code
-        self.principal_payment_frequency = emission["Principal Payment Frequency"]
-        self.coupon_frequency = emission["Coupon Frequency"]
+        self.principal_payment_frequency = emission["Principal Payment Frequency"].iloc[0]
+        self.coupon_frequency = emission["Coupon Frequency"].iloc[0]
         self.business_day_convention = bond_data["Business Day Convention"]
         self.day_count_convention = bond_data["Day Count Convention"]  # Added Day Count Convention
         self.number_of_pieces = number_of_pieces
@@ -38,15 +38,15 @@ class FixedBond:
     def generate_dates(self, emission_date, maturity_date, convention="MODFOLLOWING"):
         """Generate a list of payment dates manually, including the maturity date."""
         payment_dates = []
-        current_date = emission_date
+        current_date = self.emission_date
     
         # Handle the first coupon date
         if self.coupon_frequency == "Annual":
-            next_payment_date = emission_date.replace(year=emission_date.year + 1)
+            next_payment_date = self.emission_date.replace(year=self.emission_date.year + 1)
         elif self.coupon_frequency == "Semi-Annual":
-            next_payment_date = emission_date + pd.DateOffset(months=6)
+            next_payment_date = self.emission_date + pd.DateOffset(months=6)
         elif self.coupon_frequency == "Quarterly":
-            next_payment_date = emission_date + pd.DateOffset(months=3)
+            next_payment_date = self.emission_date + pd.DateOffset(months=3)
         else:
             raise ValueError(f"Unsupported coupon frequency: {self.coupon_frequency}")
         
