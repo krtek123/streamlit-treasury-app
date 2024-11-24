@@ -180,7 +180,7 @@ class FixedBond:
             cumulative_length_of_period += length_of_period
             
             # Use the interpolate_rate function to get the interpolated rate for the current period
-            rate_interpolated = interpolate_rate(cumulative_length_of_period / 360)/100
+            rate_interpolated = interpolate_rate(cumulative_length_of_period / 360)
     
             # Calculate the discounted coupon payment and principal repayment
             time_to_payment = cumulative_length_of_period / 360  # Time in years (since we've converted length_of_period to years)
