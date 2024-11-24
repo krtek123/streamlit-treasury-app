@@ -189,7 +189,7 @@ class FixedBond:
             coupon_discount = coupon_payment / (1 + (rate_interpolated + shift) / 100) ** time_to_payment
             
             # Calculate principal repayment
-            if self.principal_payment_frequency != "At Maturity" and remaining_principal > 0:
+            if self.principal_payment_frequency != "At Maturity" and (date != self.maturity_date):
                 # If it's not the maturity date, we amortize the principal
                 principal_repayment = calculate_principal_payment(date, payment_dates[0], payment_dates[-1])
                 remaining_principal -= principal_repayment
