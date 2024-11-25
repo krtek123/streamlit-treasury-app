@@ -38,17 +38,33 @@ class FixedBond:
     def generate_dates(self, emission_date, maturity_date, convention="MODFOLLOWING"):
         """Generate a list of payment dates manually, including the maturity date."""
         payment_dates = []
-        current_date = self.emission_date
-    
-        # Handle the first coupon date
-        if self.coupon_frequency == "Annual":
-            next_payment_date = self.emission_date.replace(year=self.emission_date.year + 1)
-        elif self.coupon_frequency == "Semi-Annual":
-            next_payment_date = self.emission_date + pd.DateOffset(months=6)
-        elif self.coupon_frequency == "Quarterly":
-            next_payment_date = self.emission_date + pd.DateOffset(months=3)
-        else:
-            raise ValueError(f"Unsupported coupon frequency: {self.coupon_frequency}")
+        current_date = emission_date
+
+        while current_date < maturity_date:
+            # Generate the next unadjusted payment date based on coupon frequency
+            if self.coupon_frequency == "Annual":
+                next_payment_date = current_date.replace(year=current_date.year + 1)
+            elif self.coupon_frequency == "Semi-Annual":
+                next_payment_date = current_date + pd.DateOffset(months=6)
+            elif self.coupon_frequency == "Quarterly":
+                next_payment_date = current_date + pd.DateOffset(months=3)
+            else:
+                raise ValueError(f"Unsupported coupon frequency: {self.coupon_frequency}")
+
+            # Check if the next payment date exceeds the maturity date
+            if next_payment_date > maturity_date:
+                next_payment_date = maturity_date
+
+            # Apply the business day convention to adjust the payment date
+            adjusted_payment_date = self.apply_business_day_convention(next_payment_date, convention)
+
+            # Append the adjusted date to the list
+            payment_dates.append(adjusted_payment_date)
+
+            # Move to the next period based on the **unadjusted date**
+            current_date = next_payment_date
+
+        return payment_dates
         
         # Apply business day convention to the first coupon date
         next_payment_date = self.apply_business_day_convention(next_payment_date, convention)
