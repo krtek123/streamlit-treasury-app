@@ -63,7 +63,10 @@ class FixedBond:
 
             # Move to the next period based on the **unadjusted date**
             current_date = next_payment_date
-
+        # Always add the maturity date (unaltered by business day convention)
+        payment_dates.append(maturity_date)
+        if self.maturity_date not in payment_dates:
+            payment_dates.append(self.maturity_date)
         return payment_dates
         
         # Apply business day convention to the first coupon date
