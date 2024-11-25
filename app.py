@@ -1,12 +1,10 @@
 import streamlit as st
-
 import pandas as pd
 from PIL import Image
-
-
 from bonds import display_fixed_rate_trade_form  # Your custom bond form function
 
 bond_emissions_file = "bond_emissions.csv"
+
 # Initialize session state variables
 if "active_pane" not in st.session_state:
     st.session_state["active_pane"] = None  # No active pane initially
@@ -21,8 +19,8 @@ if "show_bond_emissions" not in st.session_state:
 st.set_page_config(page_title="Treasury Management", layout="wide")
 
 # Load CSV files into Pandas DataFrames
-currencies_df = pd.read_csv("currencies.csv")  # Make sure this file exists
-yield_curves_df = pd.read_csv("yieldCurves.csv")  # Make sure this file exists
+currencies_df = pd.read_csv("currencies.csv")  # Ensure this file exists
+yield_curves_df = pd.read_csv("yieldCurves.csv")  # Ensure this file exists
 bond_emissions_df = pd.read_csv("bond_emissions.csv")  # Load bond emissions data
 
 # CSS for styling buttons and centering the image
@@ -188,8 +186,16 @@ def display_trade():
         selected_bond_index = bond_options.index(selected_bond_display)
         selected_bond = fixed_bonds.iloc[selected_bond_index]
 
+        # Select trade direction
+        trade_direction = st.radio("Trade Direction", options=["Buy", "Sell"])
+
+        # Enter pieces (always positive)
+        pieces = st.number_input(
+            f"Enter number of pieces for {trade_direction}:", min_value=0, step=1
+        )
+
         # Pass the selected bond to the trade form
-        display_fixed_rate_trade_form(selected_bond, yield_curves_df)  # Pass selected bond
+        display_fixed_rate_trade_form(selected_bond, yield_curves_df, trade_direction, pieces)  # Pass additional data
 
     except FileNotFoundError:
         st.warning(f"Bond emissions file `{bond_emissions_file}` not found. Please upload or check the file path.")
