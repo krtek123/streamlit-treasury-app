@@ -145,7 +145,7 @@ def display_settings():
                     transposed_curve_data = curve_data.pivot(
                         index="observation_date", columns="tenor", values="rate"
                     )
-                    st.write("**Yield Curve Data:**")
+                    st.write("**Yield Curve Datas:**")
                     st.dataframe(transposed_curve_data)
                     st.write("**Yield Curve Line Chart:**")
                     st.line_chart(curve_data.set_index("tenor")["rate"])
