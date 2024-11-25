@@ -2,10 +2,10 @@ import streamlit as st
 import pandas as pd
 from valuation import FixedBond
 
+
 def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
     st.subheader("Fixed Rate Bond")
     bond_emissions_file = "bond_emissions.csv"
-    
     try:
         # Initialize session state variables if they do not exist
         if "trade_direction" not in st.session_state:
@@ -31,38 +31,18 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
         )
         st.table(bond_details_table[["Issue Name", "ISIN", "Maturity Date", "Nominal Value", "Currency", "Coupon Rate (%)"]])
 
-        # Input fields for user parameters with dynamic updates
+        # Input fields for user parameters
         trade_direction = st.selectbox("Trade Direction", ["Buy", "Sell"], key="trade_direction_input")
         st.session_state["trade_direction"] = trade_direction
 
-        # Input number_of_pieces with condition to prevent invalid values
-        if trade_direction == "Sell":
-            # Forbid positive number for sell trades
-            number_of_pieces = st.number_input(
-                "Number of Pieces",
-                min_value=-1000,  # Max negative value (change as needed)
-                step=1,
-                value=-abs(st.session_state["number_of_pieces"]),  # Set to negative
-                key="pieces_input"
-            )
-            # Raise error if the number of pieces is positive (for "Sell" trade)
-            if number_of_pieces > 0:
-                st.error("Error: Number of pieces must be negative for 'Sell' trades.")
-                return  # Exit the function early to prevent further calculation
-        else:  # For "Buy" trade direction
-            # Ensure that value is positive and >= 1 for buy trades
-            number_of_pieces = st.number_input(
-                "Number of Pieces",
-                min_value=1,  # Ensure min value is 1
-                step=1,
-                value=abs(st.session_state["number_of_pieces"]),  # Set to positive
-                key="pieces_input"
-            )
-            # Raise error if the number of pieces is negative (for "Buy" trade)
-            if number_of_pieces < 0:
-                st.error("Error: Number of pieces must be positive for 'Buy' trades.")
-                return  # Exit the function early to prevent further calculation
-
+        # Ensure pieces are always positive
+        number_of_pieces = st.number_input(
+            "Number of Pieces",
+            min_value=1,  # Minimum value for pieces is 1
+            step=1,
+            value=st.session_state["number_of_pieces"],
+            key="pieces_input"
+        )
         st.session_state["number_of_pieces"] = number_of_pieces
 
         clean_price = st.number_input(
@@ -83,50 +63,48 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
         )
         st.session_state["accrued_interest"] = accrued_interest
 
-        # Recalculate total price automatically whenever an input changes
+        # Calculate total price
         nominal_value = selected_bond["Nominal Value (1 unit)"]
         currency = selected_bond["Nominal Value Currency"]
         total_price = number_of_pieces * (nominal_value * clean_price / 100 + accrued_interest)
 
-        # Display the recalculated total price dynamically
         st.write(f"**Total Price: {total_price:.2f} {currency}**")
 
-        # Select trade date (not dependent on form submission)
+        # Select trade date
         yield_dates = yield_curves_df["observation_date"].unique()
         trade_date = st.selectbox("Trade Date", yield_dates)
 
-        # Add a slider to select the yield curve parallel shift value
+        # Add a slider for yield curve parallel shift
         shift = st.slider(
             "Parallel Yield Curve Shift (%)",
-            min_value=-5.0,  # Set as float
-            max_value=5.0,   # Set as float
-            value=0.0,       # Set as float
-            step=0.1         # Keep step as float
+            min_value=-5.0,
+            max_value=5.0,
+            value=0.0,
+            step=0.1
         )
 
-        # Solve button to trigger cash flow and NPV calculations
+        # Solve button to calculate cash flows and NPV
         if st.button("Solve"):
-            # Initialize the FixedBond object with the bond details and yield curve data
+            # Initialize FixedBond object
             fixed_bond = FixedBond(
-                selected_bond, 
-                yield_curves_df, 
-                trade_date, 
-                selected_bond["Nominal Value Currency"], 
+                selected_bond,
+                yield_curves_df,
+                trade_date,
+                selected_bond["Nominal Value Currency"],
                 selected_bond["Principal Payment Frequency"],
                 selected_bond["Coupon Frequency"],
                 number_of_pieces=number_of_pieces
             )
 
-            # Get cash flows and NPV using the FixedBond class, passing the shift parameter
+            # Calculate cash flows and NPV
             cash_flows = fixed_bond.cash_flow(shift)
             npv = fixed_bond.npv(shift)
 
-            # Display the calculated cash flows and NPV
-            st.write("**Calculated Cash Flows**:")
+            st.write("**Calculated Cash Flows:**")
             cf_df = pd.DataFrame(cash_flows)
             st.dataframe(cf_df)
 
-            st.write(f"**Net Present Value (NPV by discounting with the yield curve): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
+            st.write(f"**Net Present Value (NPV): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
 
             # Calculate Macauley Duration
             duration = fixed_bond.macauley_duration(total_price, shift)
