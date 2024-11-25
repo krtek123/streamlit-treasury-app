@@ -228,7 +228,7 @@ class FixedBond:
                 "Length of Period": length_of_period,
                 "Cumulative Length of Period": cumulative_length_of_period,
                 "Remaining Principal": remaining_principal,
-                "Interpolated Rate": rate_interpolated + shift,
+                "Interpolated Rate": rate_interpolated + shift/100,
                 "Discounted Interest": coupon_discount,
                 "Discounted Principal": principal_discount
             })
