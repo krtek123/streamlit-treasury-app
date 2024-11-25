@@ -35,7 +35,7 @@ class FixedBond:
         else:
             raise ValueError(f"Unsupported convention: {convention}")
 
-     def generate_dates(self, emission_date, maturity_date, convention="MODFOLLOWING"):
+    def generate_dates(self, emission_date, maturity_date, convention="MODFOLLOWING"):
         """Generate a list of payment dates manually, including the maturity date."""
         payment_dates = []
         current_date = emission_date
@@ -63,11 +63,9 @@ class FixedBond:
 
             # Move to the next period based on the **unadjusted date**
             current_date = next_payment_date
-        # Filter out any dates beyond the maturity date
-        #payment_dates = [date for date in payment_dates if date <= maturity_date]
+
         # Always add the maturity date (unaltered by business day convention)
-        if self.maturity_date not in payment_dates:
-            payment_dates.append(self.maturity_date)
+        payment_dates.append(maturity_date)
 
         return payment_dates
 
