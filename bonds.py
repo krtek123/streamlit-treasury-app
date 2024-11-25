@@ -113,6 +113,7 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
                 trade_date, 
                 selected_bond["Nominal Value Currency"], 
                 selected_bond["Principal Payment Frequency"],
+                selected_bond["Coupon Frequency"],
                 number_of_pieces=number_of_pieces
             )
 
