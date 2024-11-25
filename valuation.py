@@ -134,13 +134,13 @@ class FixedBond:
         # Define how much principal to pay at each period based on frequency
         def calculate_principal_payment(payment_date, first_payment_date, last_payment_date):
             if self.principal_payment_frequency == "Annual":
-                return self.nominal_value / len(payment_dates)  # Equal payment each year
+                return (self.number_of_pieces*self.nominal_value) / len(payment_dates)  # Equal payment each year
             elif self.principal_payment_frequency == "Semi-Annual":
-                return self.nominal_value / (len(payment_dates))  # Equal semi-annual payment
+                return (self.number_of_pieces*self.nominal_value) / (len(payment_dates))  # Equal semi-annual payment
             elif self.principal_payment_frequency == "Quarterly":
-                return self.nominal_value / (len(payment_dates))  # Equal quarterly payment
+                return (self.number_of_pieces*self.nominal_value) / (len(payment_dates))  # Equal quarterly payment
             elif self.principal_payment_frequency == "Monthly":
-                return self.nominal_value / (len(payment_dates))  # Equal monthly payment
+                return (self.number_of_pieces*self.nominal_value) / (len(payment_dates))  # Equal monthly payment
             else:
                 raise ValueError(f"Unsupported principal payment frequency: {self.principal_payment_frequency}")
     
