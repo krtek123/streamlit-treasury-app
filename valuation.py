@@ -234,17 +234,26 @@ class FixedBond:
             npv += coupon_discount + principal_discount
         
         return npv
-    def macauley_duration(self, shift = 0):
+     def macauley_duration(self, price, shift=0):
+        # Get the yield to maturity
+        ytm = self.yield_to_maturity(price, shift) / 100  # Convert YTM to a decimal
+
+        # Get the bond's cash flows
         cash_flows = self.cash_flow(shift)
+
+        # Compute Macaulay duration
         weighted_sum = 0.0
         total_cash_flow = 0.0
-        
+
         for cf in cash_flows:
             time_to_payment = cf["Cumulative Length of Period"] / 360  # Convert to years
-            discounted_cash_flow = cf["Discounted Interest"] + cf["Discounted Principal"]
+            discounted_cash_flow = (
+                cf["Coupon Payment"] + cf["Principal Repayment"]
+            ) / (1 + ytm) ** time_to_payment
+
             weighted_sum += time_to_payment * discounted_cash_flow
             total_cash_flow += discounted_cash_flow
-    
+
         duration = weighted_sum / total_cash_flow
         return duration
     def yield_to_maturity(self, price, shift=0):
