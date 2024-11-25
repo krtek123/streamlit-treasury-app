@@ -85,6 +85,9 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
 
         # Solve button to calculate cash flows and NPV
         if st.button("Solve"):
+            direction_multiplier = 1 if trade_direction == "Buy" else -1  # Set multiplier to 1 for "Buy" and -1 for "Sell"
+            adjusted_number_of_pieces = number_of_pieces * direction_multiplier  # Adjust number of pieces
+
             # Initialize FixedBond object
             fixed_bond = FixedBond(
                 selected_bond,
@@ -93,7 +96,7 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
                 selected_bond["Nominal Value Currency"],
                 selected_bond["Principal Payment Frequency"],
                 selected_bond["Coupon Frequency"],
-                number_of_pieces=number_of_pieces
+                number_of_pieces=adjusted_number_of_pieces
             )
 
             # Calculate cash flows and NPV
