@@ -110,7 +110,7 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
             if shift == 0:
                 st.write(f"**Net Present Value (NPV BASE): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
             else:
-                st.write(f"**Net Present Value (NPV SCENARIO - shift {shift:.2f} %): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
+                st.write(f"**Net Present Value (NPV SCENARIO - shift {shift:.2f}%): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
 
             # Calculate Macauley Duration
             duration = fixed_bond.macauley_duration(total_price * direction_multiplier)
