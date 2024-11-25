@@ -1,3 +1,3 @@
 Issuer Code,ISIN,Issue Name,Issuer Headquarters,Jurisdiction,Issue Date,Maturity Date,Business Day Convention,Notes,Nominal Value (1 unit),Nominal Value Currency,Principal Payment Start Date,Principal Payment Frequency,Coupon Start Date,Coupon Frequency,Reference Rate Code,Fixing Lead Time (days),First Coupon Rate [%],Fixed Rate/Spread [%],Day Count Convention
-ABC123,DE8748652415,Municipal Bond Munich,Munich,Germany,2022-01-15,2033-01-15,Following,,100000,EUR,2033-01-15,At Maturity,2022-01-15,Semi-Annual,,0,,3.00,30/360
-MNO654,AT9871236540,Solaris Green Bond,Vienna,Austria,2023-09-01,2035-09-01,Following,,1000,EUR,2023-09-01,Annual,2023-09-01,Semi-Annual,,,,1.00,30/360
+ABC123,DE8748652415,Municipal Bond Munich,Munich,Germany,2022-01-14,2033-01-14,Following,,100000,EUR,2033-01-14,At Maturity,2022-01-14,Semi-Annual,,0,,3.00,30/360
+MNO654,AT9871236540,Solaris Green Bond,Vienna,Austria,2023-09-01,2035-09-02,Following,,1000,EUR,2023-09-01,Annual,2023-09-01,Semi-Annual,,,,1.00,30/360
