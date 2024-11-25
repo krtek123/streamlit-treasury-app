@@ -234,7 +234,7 @@ class FixedBond:
             npv += coupon_discount + principal_discount
         
         return npv
-     def macauley_duration(self, price, shift=0):
+    def macauley_duration(self, price, shift=0):
         # Get the yield to maturity
         ytm = self.yield_to_maturity(price, shift) / 100  # Convert YTM to a decimal
 
