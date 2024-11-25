@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from valuation import FixedBond
 
-
 def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
     st.subheader("Fixed Rate Bond")
     bond_emissions_file = "bond_emissions.csv"
@@ -110,11 +109,11 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
             st.write(f"**Net Present Value (NPV): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
 
             # Calculate Macauley Duration
-            duration = fixed_bond.macauley_duration(total_price* direction_multiplier, shift)
-            st.write(f"**Macauley Duration: {duration:.2f} years**")
+            duration = fixed_bond.macauley_duration(total_price * direction_multiplier)
+            st.write(f"**Macaulay Duration: {duration:.2f} years**")
 
             # Calculate Yield to Maturity (YTM)
-            ytm = fixed_bond.yield_to_maturity(total_price* direction_multiplier, shift)
+            ytm = fixed_bond.yield_to_maturity(total_price * direction_multiplier)
             st.write(f"**Yield to Maturity (YTM): {ytm:.2f}%**")
 
     except FileNotFoundError:
