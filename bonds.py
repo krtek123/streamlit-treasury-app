@@ -3,7 +3,7 @@ import pandas as pd
 from valuation import FixedBond
 
 def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
-    st.subheader("Fixed Rate Principal at Maturity Bond")
+    st.subheader("Fixed Rate Bond")
     bond_emissions_file = "bond_emissions.csv"
     
     try:
