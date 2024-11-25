@@ -205,7 +205,7 @@ class FixedBond:
             time_to_payment = cumulative_length_of_period / 360  # Time in years (since we've converted length_of_period to years)
             
             # Discount the coupon payment
-            coupon_discount = coupon_payment / (1 + (rate_interpolated ) + shift) ** time_to_payment
+            coupon_discount = coupon_payment / (1 + (rate_interpolated ) + (shift/100)) ** time_to_payment
             
             # Calculate principal repayment
             if self.principal_payment_frequency != "At Maturity" and (date != self.maturity_date):
@@ -218,7 +218,7 @@ class FixedBond:
                 remaining_principal = 0  # Principal is fully paid off at maturity
             
             # Discount the principal repayment
-            principal_discount = principal_repayment / (1 + (rate_interpolated ) + shift) ** time_to_payment
+            principal_discount = principal_repayment / (1 + (rate_interpolated ) + (shift/100)) ** time_to_payment
     
             # Append the cash flow details with new columns for Interpolated Rate and Discounted Payments
             cash_flows.append({
