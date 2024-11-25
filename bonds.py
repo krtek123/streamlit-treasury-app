@@ -129,7 +129,7 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
             st.write(f"**Net Present Value (NPV by discounting with the yield curve): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
 
             # Calculate Macauley Duration
-            duration = fixed_bond.macauley_duration(shift)
+            duration = fixed_bond.macauley_duration(total_price, shift)
             st.write(f"**Macauley Duration: {duration:.2f} years**")
 
             # Calculate Yield to Maturity (YTM)
