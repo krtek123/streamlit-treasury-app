@@ -106,7 +106,11 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
             cf_df = pd.DataFrame(cash_flows)
             st.dataframe(cf_df)
 
-            st.write(f"**Net Present Value (NPV): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
+            # Conditional display of NPV label based on shift value
+            if shift == 0:
+                st.write(f"**Net Present Value (NPV BASE): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
+            else:
+                st.write(f"**Net Present Value (NPV SCENARIO - shift {shift:.2f}): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
 
             # Calculate Macauley Duration
             duration = fixed_bond.macauley_duration(total_price * direction_multiplier)
@@ -115,6 +119,7 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
             # Calculate Yield to Maturity (YTM)
             ytm = fixed_bond.yield_to_maturity(total_price * direction_multiplier)
             st.write(f"**Yield to Maturity (YTM): {ytm:.2f}%**")
+
 
     except FileNotFoundError:
         st.warning(f"Bond emissions file {bond_emissions_file} not found. Please upload or check the file path.")
