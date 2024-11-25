@@ -9,7 +9,7 @@ class FixedBond:
         self.issue_name = bond_data["Issue Name"]
         self.isin = bond_data["ISIN"]
         #emission = pd.read_csv("bond_emissions.csv")
-        emission = emission[emission.ISIN == self.isin]
+        #emission = emission[emission.ISIN == self.isin]
         self.maturity_date = pd.to_datetime(bond_data["Maturity Date"])
         self.nominal_value = bond_data["Nominal Value (1 unit)"]
         self.currency = bond_data["Nominal Value Currency"]
