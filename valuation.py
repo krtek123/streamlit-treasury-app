@@ -63,9 +63,10 @@ class FixedBond:
 
             # Move to the next period based on the **unadjusted date**
             current_date = next_payment_date
-
+        payment_dates = [date for date in payment_dates if date <= maturity_date]
         # Always add the maturity date (unaltered by business day convention)
-        payment_dates.append(maturity_date)
+        if maturity_date not in payment_dates:
+            payment_dates.append(maturity_date)
 
         return payment_dates
 
