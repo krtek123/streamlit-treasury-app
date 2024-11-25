@@ -35,7 +35,7 @@ class FixedBond:
         else:
             raise ValueError(f"Unsupported convention: {convention}")
 
-    def generate_dates(self, emission_date, maturity_date, convention="MODFOLLOWING"):
+     def generate_dates(self, emission_date, maturity_date, convention="MODFOLLOWING"):
         """Generate a list of payment dates manually, including the maturity date."""
         payment_dates = []
         current_date = emission_date
@@ -51,9 +51,9 @@ class FixedBond:
             else:
                 raise ValueError(f"Unsupported coupon frequency: {self.coupon_frequency}")
 
-            # Check if the next payment date exceeds the maturity date
-            if next_payment_date > maturity_date:
-                next_payment_date = maturity_date
+            # If the next payment date exceeds maturity, break the loop
+            if next_payment_date >= maturity_date:
+                break
 
             # Apply the business day convention to adjust the payment date
             adjusted_payment_date = self.apply_business_day_convention(next_payment_date, convention)
@@ -63,37 +63,14 @@ class FixedBond:
 
             # Move to the next period based on the **unadjusted date**
             current_date = next_payment_date
-        # Always add the maturity date (unaltered by business day convention)
-        payment_dates.append(maturity_date)
-        if self.maturity_date not in payment_dates:
-            payment_dates.append(self.maturity_date)
-        return payment_dates
-        
-        # Apply business day convention to the first coupon date
-        next_payment_date = self.apply_business_day_convention(next_payment_date, convention)
-        payment_dates.append(next_payment_date)
-    
-        # Generate subsequent coupon payment dates
-        while next_payment_date < maturity_date:
-            if self.coupon_frequency == "Annual":
-                next_payment_date = next_payment_date.replace(year=next_payment_date.year + 1)
-            elif self.coupon_frequency == "Semi-Annual":
-                next_payment_date = next_payment_date + pd.DateOffset(months=6)
-            elif self.coupon_frequency == "Quarterly":
-                next_payment_date = next_payment_date + pd.DateOffset(months=3)
-    
-            # Apply business day convention to each subsequent coupon date
-            next_payment_date = self.apply_business_day_convention(next_payment_date, convention)
-            payment_dates.append(next_payment_date)
-    
-        
-    
         # Filter out any dates beyond the maturity date
-        payment_dates = [date for date in payment_dates if date <= maturity_date]
+        #payment_dates = [date for date in payment_dates if date <= maturity_date]
+        # Always add the maturity date (unaltered by business day convention)
         if self.maturity_date not in payment_dates:
             payment_dates.append(self.maturity_date)
-        
+
         return payment_dates
+
 
     def calculate_days(self, start_date, end_date, convention="ACT/360"):
         start_date = pd.to_datetime(start_date)
