@@ -86,8 +86,7 @@ class FixedBond:
             next_payment_date = self.apply_business_day_convention(next_payment_date, convention)
             payment_dates.append(next_payment_date)
     
-        # Ensure the maturity date is included and apply the business day convention
-        payment_dates.append(self.apply_business_day_convention(maturity_date, convention))
+        
     
         # Filter out any dates beyond the maturity date
         payment_dates = [date for date in payment_dates if date <= maturity_date]
