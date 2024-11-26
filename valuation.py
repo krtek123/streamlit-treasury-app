@@ -305,9 +305,7 @@ class FixedBond:
         except RuntimeError:
             raise ValueError(f"Failed to converge to a YTM for the bond with price: {target_price}")
         
-        # Return annualized YTM for semiannual bonds
-        if self.coupon_frequency == "Semi-Annual":
-            return ytm * 2  # Convert semiannual rate to annualized
+        
         return ytm
 
 
