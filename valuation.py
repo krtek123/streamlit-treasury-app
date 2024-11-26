@@ -308,7 +308,7 @@ class FixedBond:
         
         return ytm
 
-
+"""
 # Sample bond data for testing
 bond_data = {
     "Issue Name": "Corporate Bond 1",
@@ -333,3 +333,4 @@ yield_curve_df = pd.DataFrame({
 # Instantiate and calculate NPV
 bond = FixedBond(bond_data, yield_curve_df, "2024-11-24", "CZK", coupon_frequency="Annual")
 print(bond.npv())
+"""
