@@ -107,56 +107,56 @@ class FixedBond:
         payment_dates = self.generate_dates(self.emission_date, self.maturity_date, convention=self.business_day_convention)
         remaining_principal = self.number_of_pieces * self.nominal_value
         cumulative_length_of_period = 0
-
+    
         # Interpolate the entire yield curve for all tenors
         yield_curve_data = self.yield_curve_df[["currency", "observation_date", "tenor", "rate"]]
-
+    
         # Filter the relevant yield curve for the currency and trade date
         relevant_curve = yield_curve_data[
             (yield_curve_data["currency"] == self.currency_code) &
             (pd.to_datetime(yield_curve_data["observation_date"]) == self.trade_date)
         ]
-
+        
         if relevant_curve.empty:
             raise ValueError(f"No yield curve data available for the selected trade date and currency: {self.currency_code}")
-
+        
         # Ensure the yield curve is sorted by tenor
         relevant_curve = relevant_curve.sort_values(by="tenor")
-
+    
         # Extract tenors and rates from the yield curve
         tenors = relevant_curve["tenor"].values
         rates = relevant_curve["rate"].values
-
+    
         # Interpolate the yield curve using numpy (handling the full curve)
         def interpolate_rate(length_in_years):
             return np.interp(length_in_years, tenors, rates, left=rates[0], right=rates[-1])
-
+    
         # Define how much principal to pay at each period based on frequency
         def calculate_principal_payment(payment_date, first_payment_date, last_payment_date):
             if self.principal_payment_frequency == "Annual":
-                return (self.number_of_pieces * self.nominal_value) / len(payment_dates)  # Equal payment each year
+                return (self.number_of_pieces*self.nominal_value) / len(payment_dates)  # Equal payment each year
             elif self.principal_payment_frequency == "Semi-Annual":
-                return (self.number_of_pieces * self.nominal_value) / len(payment_dates)  # Equal semi-annual payment
+                return (self.number_of_pieces*self.nominal_value) / (len(payment_dates))  # Equal semi-annual payment
             elif self.principal_payment_frequency == "Quarterly":
-                return (self.number_of_pieces * self.nominal_value) / len(payment_dates)  # Equal quarterly payment
+                return (self.number_of_pieces*self.nominal_value) / (len(payment_dates))  # Equal quarterly payment
             elif self.principal_payment_frequency == "Monthly":
-                return (self.number_of_pieces * self.nominal_value) / len(payment_dates)  # Equal monthly payment
+                return (self.number_of_pieces*self.nominal_value) / (len(payment_dates))  # Equal monthly payment
             else:
                 raise ValueError(f"Unsupported principal payment frequency: {self.principal_payment_frequency}")
-
+    
         for i, date in enumerate(payment_dates):
             # Skip cash flows before the trade date
             if date < self.trade_date:
                 continue  # Skip this iteration if the payment date is before the trade date
-
+            
             coupon_payment = 0
             principal_repayment = 0
-
+    
             if i == 0:
                 length_of_period = self.calculate_days(self.emission_date, date, convention=self.day_count_convention)
             else:
                 length_of_period = self.calculate_days(payment_dates[i - 1], date, convention=self.day_count_convention)
-
+            
             # Convert length_of_period from days to years based on the day count convention
             if self.day_count_convention in ["ACT/360", "30/360"]:
                 length_in_years = length_of_period / 360
@@ -164,33 +164,37 @@ class FixedBond:
                 length_in_years = length_of_period / 365
             else:
                 raise ValueError(f"Unsupported day count convention: {self.day_count_convention}")
-
-            # Calculate principal repayment first
-            if self.principal_payment_frequency != "At Maturity" and (date != self.maturity_date):
-                principal_repayment = calculate_principal_payment(date, payment_dates[0], payment_dates[-1])
-            elif date == self.maturity_date:
-                principal_repayment = remaining_principal  # Final repayment of all remaining principal
-
-            # Update remaining principal *before* calculating coupon payments
-            remaining_principal -= principal_repayment
-
-            # Now calculate coupon payment based on updated remaining principal
-            coupon_payment = remaining_principal * (self.coupon_rate / 100) * length_in_years
-
+            
+            # Calculate coupon payment based on day count convention
+            if self.day_count_convention in ["30/360", "ACT/360"]:
+                coupon_payment = remaining_principal * (self.coupon_rate / 100) * (length_of_period / 360)
+            else:
+                coupon_payment = remaining_principal * (self.coupon_rate / 100) * (length_of_period / 365)
+    
             cumulative_length_of_period += length_of_period
-
+            
             # Use the interpolate_rate function to get the interpolated rate for the current period
             rate_interpolated = interpolate_rate(cumulative_length_of_period / 360)
-
+    
             # Calculate the discounted coupon payment and principal repayment
             time_to_payment = cumulative_length_of_period / 360  # Time in years (since we've converted length_of_period to years)
-
+            
             # Discount the coupon payment
-            coupon_discount = coupon_payment / (1 + rate_interpolated + (shift / 100)) ** time_to_payment
-
+            coupon_discount = coupon_payment / (1 + (rate_interpolated ) + (shift/100)) ** time_to_payment
+            
+            # Calculate principal repayment
+            if self.principal_payment_frequency != "At Maturity" and (date != self.maturity_date):
+                # If it's not the maturity date, we amortize the principal
+                principal_repayment = calculate_principal_payment(date, payment_dates[0], payment_dates[-1])
+                remaining_principal -= principal_repayment
+            if date == self.maturity_date:
+                # At maturity, the entire remaining principal is repaid
+                principal_repayment = remaining_principal
+                remaining_principal = 0  # Principal is fully paid off at maturity
+            
             # Discount the principal repayment
-            principal_discount = principal_repayment / (1 + rate_interpolated + (shift / 100)) ** time_to_payment
-
+            principal_discount = principal_repayment / (1 + (rate_interpolated ) + (shift/100)) ** time_to_payment
+    
             # Append the cash flow details with new columns for Interpolated Rate and Discounted Payments
             cash_flows.append({
                 "Date": date,
@@ -199,17 +203,16 @@ class FixedBond:
                 "Length of Period": length_of_period,
                 "Cumulative Length of Period": cumulative_length_of_period,
                 "Remaining Principal": remaining_principal,
-                "Interpolated Rate": rate_interpolated + shift / 100,
+                "Interpolated Rate": rate_interpolated + shift/100,
                 "Discounted Interest": coupon_discount,
                 "Discounted Principal": principal_discount
             })
-
+    
         # Safely print all the cash flows after all have been added
         for cash_flow in cash_flows:
             print(cash_flow)
-
+    
         return cash_flows
-
 
     def npv(self, shift = 0):
         yield_curve = self.yield_curve_df[ 
