@@ -104,6 +104,10 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
 
             st.write("**Calculated Cash Flows:**")
             cf_df = pd.DataFrame(cash_flows)
+            # Convert date column to ISO format (YYYY-MM-DD)
+            if 'Date' in cf_df.columns:
+                cf_df['Date'] = pd.to_datetime(cf_df['Date']).dt.strftime('%Y-%m-%d')
+
             st.dataframe(cf_df)
 
             # Conditional display of NPV label based on shift value
