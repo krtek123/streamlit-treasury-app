@@ -167,9 +167,9 @@ class FixedBond:
             
             # Calculate coupon payment based on day count convention
             if self.day_count_convention in ["30/360", "ACT/360"]:
-                coupon_payment = self.number_of_pieces * (self.nominal_value * self.coupon_rate / 100) * (length_of_period / 360)
+                coupon_payment = remaining_principal * (self.coupon_rate / 100) * (length_of_period / 360)
             else:
-                coupon_payment = self.number_of_pieces * (self.nominal_value * self.coupon_rate / 100) * (length_of_period / 365)
+                coupon_payment = remaining_principal * (self.coupon_rate / 100) * (length_of_period / 365)
     
             cumulative_length_of_period += length_of_period
             
