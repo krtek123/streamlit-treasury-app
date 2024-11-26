@@ -1,3 +1,7 @@
+import streamlit as st
+import pandas as pd
+from valuation import FixedBond
+
 def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
     st.subheader("Fixed Rate Bond")
     bond_emissions_file = "bond_emissions.csv"
@@ -30,9 +34,10 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
         trade_direction = st.selectbox("Trade Direction", ["Buy", "Sell"], key="trade_direction_input")
         st.session_state["trade_direction"] = trade_direction
 
+        # Ensure pieces are always positive
         number_of_pieces = st.number_input(
             "Number of Pieces",
-            min_value=1,
+            min_value=1,  # Minimum value for pieces is 1
             step=1,
             value=st.session_state["number_of_pieces"],
             key="pieces_input"
@@ -77,19 +82,23 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
             step=0.1
         )
 
-        # Initialize FixedBond object
-        fixed_bond = FixedBond(
-            selected_bond,
-            yield_curves_df,
-            trade_date,
-            selected_bond["Nominal Value Currency"],
-            selected_bond["Principal Payment Frequency"],
-            selected_bond["Coupon Frequency"],
-            number_of_pieces=number_of_pieces
-        )
+        # Solve button to calculate cash flows and NPV
+        if st.button("Solve"):
+            direction_multiplier = 1 if trade_direction == "Buy" else -1  # Set multiplier to 1 for "Buy" and -1 for "Sell"
+            adjusted_number_of_pieces = number_of_pieces * direction_multiplier  # Adjust number of pieces
 
-        # Buttons for different calculations
-        if st.button("Calculate Cash Flows and NPV"):
+            # Initialize FixedBond object
+            fixed_bond = FixedBond(
+                selected_bond,
+                yield_curves_df,
+                trade_date,
+                selected_bond["Nominal Value Currency"],
+                selected_bond["Principal Payment Frequency"],
+                selected_bond["Coupon Frequency"],
+                number_of_pieces=adjusted_number_of_pieces
+            )
+
+            # Calculate cash flows and NPV
             cash_flows = fixed_bond.cash_flow(shift)
             npv = fixed_bond.npv(shift)
 
@@ -97,18 +106,20 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
             cf_df = pd.DataFrame(cash_flows)
             st.dataframe(cf_df)
 
+            # Conditional display of NPV label based on shift value
             if shift == 0:
-                st.write(f"**Net Present Value (NPV BASE): {npv:.2f} {currency}**")
+                st.write(f"**Net Present Value (NPV BASE): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
             else:
-                st.write(f"**Net Present Value (NPV SCENARIO - shift {shift:.2f}%): {npv:.2f} {currency}**")
+                st.write(f"**Net Present Value (NPV SCENARIO - shift {shift:.2f}%): {npv:.2f} {selected_bond['Nominal Value Currency']}**")
 
-        if st.button("Calculate Duration"):
-            duration = fixed_bond.macauley_duration(total_price)
+            # Calculate Macauley Duration
+            duration = fixed_bond.macauley_duration(total_price * direction_multiplier)
             st.write(f"**Macaulay Duration: {duration:.2f} years**")
 
-        if st.button("Calculate YTM"):
-            ytm = fixed_bond.yield_to_maturity(total_price)
+            # Calculate Yield to Maturity (YTM)
+            ytm = fixed_bond.yield_to_maturity(total_price * direction_multiplier)
             st.write(f"**Yield to Maturity (YTM): {ytm:.2f}%**")
+
 
     except FileNotFoundError:
         st.warning(f"Bond emissions file {bond_emissions_file} not found. Please upload or check the file path.")
