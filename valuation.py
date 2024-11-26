@@ -241,20 +241,37 @@ class FixedBond:
         # Get the bond's cash flows
         cash_flows = self.cash_flow(shift)
 
+        # Adjust YTM for semi-annual frequency if needed
+        if self.coupon_frequency == "Semi-Annual":
+            ytm /= 2  # Semi-annual yield
+
         # Compute Macaulay duration
         weighted_sum = 0.0
         total_cash_flow = 0.0
 
         for cf in cash_flows:
-            time_to_payment = cf["Cumulative Length of Period"] / 360  # Convert to years
+            # Adjust time to payment based on frequency
+            if self.coupon_frequency == "Semi-Annual":
+                time_to_payment = cf["Cumulative Length of Period"] / 180  # Half-years
+            else:  # Default to annual
+                time_to_payment = cf["Cumulative Length of Period"] / 360  # Years
+
+            # Calculate discounted cash flows
             discounted_cash_flow = (
                 cf["Coupon Payment"] + cf["Principal Repayment"]
             ) / (1 + ytm) ** time_to_payment
 
+            # Accumulate weighted sum and total cash flow
             weighted_sum += time_to_payment * discounted_cash_flow
             total_cash_flow += discounted_cash_flow
 
+        # Calculate duration (weighted average time to cash flow)
         duration = weighted_sum / total_cash_flow
+
+        # Adjust duration to annualized if semi-annual
+        if self.coupon_frequency == "Semi-Annual":
+            duration /= 2
+
         return duration
     def yield_to_maturity(self, price, shift=0):
         def bond_price(rate, cash_flows, target_price):
