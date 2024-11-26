@@ -281,12 +281,12 @@ class FixedBond:
                 if self.coupon_frequency == "Semi-Annual":
                     # Adjust time to payment and rate for semiannual convention
                     time_to_payment = cf["Cumulative Length of Period"] / 180  # Half-years
-                    discount_rate = (rate / 2 + shift / 200)  # Semiannual rate
+                    discount_rate = (rate/2 + shift) / 100  # Semiannual rate
                 else:
                     # Default to annual convention
                     time_to_payment = cf["Cumulative Length of Period"] / 360  # Years
                     discount_rate = (rate + shift) / 100
-
+            
                 discounted_coupon = cf["Coupon Payment"] / (1 + discount_rate) ** time_to_payment
                 discounted_principal = cf["Principal Repayment"] / (1 + discount_rate) ** time_to_payment
                 price += discounted_coupon + discounted_principal
