@@ -257,30 +257,40 @@ class FixedBond:
         duration = weighted_sum / total_cash_flow
         return duration
     def yield_to_maturity(self, price, shift=0):
-        def bond_price(rate, cash_flows, target_price, shift):
+        def bond_price(rate, cash_flows, target_price):
             """Calculate the price of the bond given a rate (YTM)."""
             price = 0.0
             for cf in cash_flows:
-                time_to_payment = cf["Cumulative Length of Period"] / 360  # Convert to years
-                discounted_coupon = cf["Coupon Payment"] / (1 + (rate + shift) / 100) ** time_to_payment
-                discounted_principal = cf["Principal Repayment"] / (1 + (rate + shift) / 100) ** time_to_payment
+                if self.coupon_frequency == "Semi-Annual":
+                    # Adjust time to payment and rate for semiannual convention
+                    time_to_payment = cf["Cumulative Length of Period"] / 180  # Half-years
+                    discount_rate = (rate / 2 + shift / 200)  # Semiannual rate
+                else:
+                    # Default to annual convention
+                    time_to_payment = cf["Cumulative Length of Period"] / 360  # Years
+                    discount_rate = (rate + shift) / 100
+
+                discounted_coupon = cf["Coupon Payment"] / (1 + discount_rate) ** time_to_payment
+                discounted_principal = cf["Principal Repayment"] / (1 + discount_rate) ** time_to_payment
                 price += discounted_coupon + discounted_principal
+
             return price - target_price  # Return the difference from the target price
-        
-        
-        
-        # Get the bond's cash flows (including Coupon Payment and Principal Repayment)
+
+        # Get the bond's cash flows
         cash_flows = self.cash_flow(shift)
         
-        # The target price should be passed here (not always 0.05%)
+        # The target price should be passed here
         target_price = price
         
         # Use scipy's Newton method to find the YTM (root of the bond price function)
         try:
-            ytm = opt.newton(bond_price, x0=0.05, args=(cash_flows, target_price, shift))
+            ytm = opt.newton(bond_price, x0=0.05, args=(cash_flows, target_price))
         except RuntimeError:
             raise ValueError(f"Failed to converge to a YTM for the bond with price: {target_price}")
         
+        # Return annualized YTM for semiannual bonds
+        if self.coupon_frequency == "Semi-Annual":
+            return ytm * 2  # Convert semiannual rate to annualized
         return ytm
 
 
