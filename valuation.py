@@ -106,7 +106,7 @@ class FixedBond:
         cash_flows = []
         payment_dates = self.generate_dates(self.emission_date, self.maturity_date, convention=self.business_day_convention)
         remaining_principal = self.number_of_pieces * self.nominal_value
-        cumulative_length_of_period = 0
+        days_from_trade_date = 0
     
         # Interpolate the entire yield curve for all tenors
         yield_curve_data = self.yield_curve_df[["currency", "observation_date", "tenor", "rate"]]
@@ -171,13 +171,13 @@ class FixedBond:
             else:
                 coupon_payment = remaining_principal * (self.coupon_rate / 100) * (length_of_period / 365)
             
-            cumulative_length_of_period = self.calculate_days(self.trade_date, date, convention=self.day_count_convention)
+            days_from_trade_date = self.calculate_days(self.trade_date, date, convention=self.day_count_convention)
             
             # Use the interpolate_rate function to get the interpolated rate for the current period
-            rate_interpolated = interpolate_rate(cumulative_length_of_period / 360)
+            rate_interpolated = interpolate_rate(days_from_trade_date / 360)
     
             # Calculate the discounted coupon payment and principal repayment
-            time_to_payment = cumulative_length_of_period / 360  # Time in years (since we've converted length_of_period to years)
+            time_to_payment = days_from_trade_date / 360  # Time in years (since we've converted length_of_period to years)
             
             # Discount the coupon payment
             coupon_discount = coupon_payment / (1 + (rate_interpolated ) + (shift/100)) ** time_to_payment
@@ -201,7 +201,7 @@ class FixedBond:
                 "Coupon Payment": coupon_payment,
                 "Principal Repayment": principal_repayment,
                 "Length of Period": length_of_period,
-                "Cumulative Length of Period": cumulative_length_of_period,
+                "Days from trade date": days_from_trade_date,
                 "Remaining Principal": remaining_principal,
                 "Interpolated Rate": rate_interpolated + shift/100,
                 "Discounted Interest": coupon_discount,
