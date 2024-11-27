@@ -252,9 +252,9 @@ class FixedBond:
         for cf in cash_flows:
             # Adjust time to payment based on frequency
             if self.coupon_frequency == "Semi-Annual":
-                time_to_payment = cf["Cumulative Length of Period"] / 180  # Half-years
+                time_to_payment = cf["Days from trade date"] / 180  # Half-years
             else:  # Default to annual
-                time_to_payment = cf["Cumulative Length of Period"] / 360  # Years
+                time_to_payment = cf["Days from trade date"] / 360  # Years
 
             # Calculate discounted cash flows
             discounted_cash_flow = (
@@ -280,11 +280,11 @@ class FixedBond:
             for cf in cash_flows:
                 if self.coupon_frequency == "Semi-Annual":
                     # Adjust time to payment and rate for semiannual convention
-                    time_to_payment = cf["Cumulative Length of Period"] / 180  # Half-years
+                    time_to_payment = cf["Days from trade date"] / 180  # Half-years
                     discount_rate = (rate/2 + shift) / 100  # Semiannual rate
                 else:
                     # Default to annual convention
-                    time_to_payment = cf["Cumulative Length of Period"] / 360  # Years
+                    time_to_payment = cf["Days from trade date"] / 360  # Years
                     discount_rate = (rate + shift) / 100
             
                 discounted_coupon = cf["Coupon Payment"] / (1 + discount_rate) ** time_to_payment
