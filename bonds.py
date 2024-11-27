@@ -33,7 +33,7 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
                 "Business Day Convention":"Business Day Convention"
             }
         )
-        st.table(bond_details_table[["Issue Name", "ISIN", "Maturity Date", "Nominal Value", "Currency", "Coupon Rate (%)"]])
+        st.table(bond_details_table)
 
         # Input fields for user parameters
         trade_direction = st.selectbox("Trade Direction", ["Buy", "Sell"], key="trade_direction_input")
