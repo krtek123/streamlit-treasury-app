@@ -170,7 +170,7 @@ class FixedBond:
                 coupon_payment = remaining_principal * (self.coupon_rate / 100) * (length_of_period / 360)
             else:
                 coupon_payment = remaining_principal * (self.coupon_rate / 100) * (length_of_period / 365)
-            if 
+            
             cumulative_length_of_period = self.calculate_days(self.trade_date, date, convention=self.day_count_convention)
             
             # Use the interpolate_rate function to get the interpolated rate for the current period
