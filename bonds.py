@@ -22,10 +22,15 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
             columns={
                 "Issue Name": "Issue Name",
                 "ISIN": "ISIN",
+                "Issue Date":"Issue Date",
                 "Maturity Date": "Maturity Date",
                 "Nominal Value (1 unit)": "Nominal Value",
                 "Nominal Value Currency": "Currency",
                 "Fixed Rate/Spread [%]": "Coupon Rate (%)",
+                "Principal Payment Frequency":"Principal Payment Frequency",
+                "Coupon Frequency":"Coupon Frequency",
+                "Day Count Convention":"Day Count Convention",
+                "Business Day Convention":"Business Day Convention"
             }
         )
         st.table(bond_details_table[["Issue Name", "ISIN", "Maturity Date", "Nominal Value", "Currency", "Coupon Rate (%)"]])
