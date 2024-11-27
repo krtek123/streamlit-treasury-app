@@ -106,7 +106,7 @@ def display_fixed_rate_trade_form(selected_bond, yield_curves_df):
             # Calculate cash flows and NPV
             cash_flows = fixed_bond.cash_flow(shift)
             npv = fixed_bond.npv(shift)
-
+            st.write(f"Calculations as of: {self.trade_date.strftime('%Y-%m-%d')}")
             st.write("**Calculated Cash Flows:**")
             cf_df = pd.DataFrame(cash_flows)
             # Convert date column to ISO format (YYYY-MM-DD)
