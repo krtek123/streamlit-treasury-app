@@ -164,12 +164,14 @@ class FixedBond:
                 length_in_years = length_of_period / 365
             else:
                 raise ValueError(f"Unsupported day count convention: {self.day_count_convention}")
-            
+            frequency_map = {"Annual": 1, "Semi-Annual": 2, "Quarterly": 4, "Monthly": 12}
+            frequency = frequency_map.get(self.coupon_frequency, 1)
+            period_length = 1 / frequency
             # Calculate coupon payment based on day count convention
             if self.day_count_convention in ["30/360", "ACT/360"]:
-                coupon_payment = remaining_principal * (self.coupon_rate / 100) * (length_of_period / 360)
+                coupon_payment = remaining_principal * (self.coupon_rate / 100) * period_length #(length_of_period / 360)
             else:
-                coupon_payment = remaining_principal * (self.coupon_rate / 100) * (length_of_period / 365)
+                coupon_payment = remaining_principal * (self.coupon_rate / 100) * period_length #(length_of_period / 365)
             
             days_from_trade_date = self.calculate_days(self.trade_date, date, convention=self.day_count_convention)
             
