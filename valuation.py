@@ -202,7 +202,7 @@ class FixedBond:
                 "Date": date,
                 "Coupon Payment": coupon_payment,
                 "Principal Repayment": principal_repayment,
-                "Length of Period": length_of_period,
+                #"Length of Period": length_of_period,
                 "Days from trade date": days_from_trade_date,
                 "Remaining Principal": remaining_principal,
                 "Interpolated Rate": rate_interpolated + shift/100,
